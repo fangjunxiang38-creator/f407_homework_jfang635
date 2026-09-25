@@ -88,8 +88,13 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM3_Init();
+  MX_TIM9_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);
 
   /* USER CODE END 2 */
 
@@ -97,8 +102,32 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
-    HAL_Delay(5000);
+   
+      
+    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,1000);
+    HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,1500);
+    HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,2000);
+    HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,2500);
+
+
+     for(int i=0;i<100;i++)
+    {
+      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_1,i);
+      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_2,i);
+      HAL_Delay(10);
+
+
+    }
+    for(int i=99;i>=0;i--)
+    {
+      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_1,i);
+      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_2,i);
+      HAL_Delay(10);
+    }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
