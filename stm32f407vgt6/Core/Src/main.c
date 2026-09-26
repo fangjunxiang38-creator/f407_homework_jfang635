@@ -18,11 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -44,6 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t receivedata[2];
 
 /* USER CODE END PV */
 
@@ -55,6 +59,23 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  HAL_UART_Transmit_IT(&huart1,receivedata,2);
+
+  GPIO_PinState state =GPIO_PIN_SET;
+    if (receivedata[1]=='0'){
+      state=GPIO_PIN_RESET;
+    }
+    if (receivedata[0]=='R'){
+      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, state);
+    }
+    else if (receivedata[0]=='G'){
+      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, state);
+    }
+    HAL_UART_Receive_IT(&huart1, receivedata, 2); 
+
+}
 
 /* USER CODE END 0 */
 
@@ -90,11 +111,13 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM9_Init();
   MX_TIM2_Init();
+  MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim3);
-  HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);
+  //char mess[] ="hello world";
+  
+  HAL_UART_Receive_IT(&huart1,receivedata,2);
+
 
   /* USER CODE END 2 */
 
@@ -102,31 +125,33 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    
+    //HAL_UART_Transmit(&huart1,(uint8_t*)mess,strlen(mess),100);
+    //HAL_Delay(1000);
+    // 
+    
+    //HAL_UART_Receive(&huart1,receivedata,2,HAL_MAX_DELAY);
+    //HAL_UART_Transmit(&huart1,receivedata,2,100);
+
+    //HAL_UART_Transmit_IT(&huart1,receivedata,2);
+
+
+    //GPIO_PinState state =GPIO_PIN_SET;
+    //if (receivedata[1]=='0'){
+      //state=GPIO_PIN_RESET;
+    //}
+    //if (receivedata[0]=='R'){
+      //HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, state);
+    //}
+    ///else if (receivedata[0]=='G'){
+      //HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, state);
+    
+    
+    
+
+
    
-      
-    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,1000);
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,1500);
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,2000);
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,2500);
-
-
-     for(int i=0;i<100;i++)
-    {
-      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_1,i);
-      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_2,i);
-      HAL_Delay(10);
-
-
-    }
-    for(int i=99;i>=0;i--)
-    {
-      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_1,i);
-      __HAL_TIM_SET_COMPARE(&htim9,TIM_CHANNEL_2,i);
-      HAL_Delay(10);
-    }
+    
 
     /* USER CODE END WHILE */
 
