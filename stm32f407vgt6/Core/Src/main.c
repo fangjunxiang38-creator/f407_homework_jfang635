@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -47,7 +48,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t receivedata[2];
+uint8_t receivedata[50];
 
 /* USER CODE END PV */
 
@@ -61,7 +62,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  HAL_UART_Transmit_IT(&huart1,receivedata,2);
+  HAL_UART_Transmit_DMA(&huart1,receivedata,2);
 
   GPIO_PinState state =GPIO_PIN_SET;
     if (receivedata[1]=='0'){
@@ -73,8 +74,20 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     else if (receivedata[0]=='G'){
       HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, state);
     }
-    HAL_UART_Receive_IT(&huart1, receivedata, 2); 
+    HAL_UART_Receive_DMA(&huart1, receivedata, 2); 
 
+}
+
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+  if(huart==&huart1)
+  {
+    HAL_UART_Transmit_DMA(&huart1,receivedata,Size);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receivedata,sizeof(receivedata));
+
+
+  }
 }
 
 /* USER CODE END 0 */
@@ -108,6 +121,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM3_Init();
   MX_TIM9_Init();
   MX_TIM2_Init();
@@ -116,7 +130,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   //char mess[] ="hello world";
   
-  HAL_UART_Receive_IT(&huart1,receivedata,2);
+  //HAL_UART_Receive_DMA(&huart1,receivedata,2);
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receivedata,sizeof(receivedata));
 
 
   /* USER CODE END 2 */
