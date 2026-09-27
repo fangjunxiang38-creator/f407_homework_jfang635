@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "can.h"
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
@@ -60,35 +61,35 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  HAL_UART_Transmit_DMA(&huart1,receivedata,2);
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+  //HAL_UART_Transmit_DMA(&huart1,receivedata,2);
 
-  GPIO_PinState state =GPIO_PIN_SET;
-    if (receivedata[1]=='0'){
-      state=GPIO_PIN_RESET;
-    }
-    if (receivedata[0]=='R'){
-      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, state);
-    }
-    else if (receivedata[0]=='G'){
-      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, state);
-    }
-    HAL_UART_Receive_DMA(&huart1, receivedata, 2); 
+  //GPIO_PinState state =GPIO_PIN_SET;
+    //if (receivedata[1]=='0'){
+      //state=GPIO_PIN_RESET;
+    //}
+    //if (receivedata[0]=='R'){
+      //HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, state);
+    //}
+    //else if (receivedata[0]=='G'){
+      //HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, state);
+    //}
+    //HAL_UART_Receive_DMA(&huart1, receivedata, 2); 
 
-}
-
-
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
-{
-  if(huart==&huart1)
-  {
-    HAL_UART_Transmit_DMA(&huart1,receivedata,Size);
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receivedata,sizeof(receivedata));
+//}
 
 
-  }
-}
+//void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+//{
+  //if(huart==&huart1)
+  //{
+    //HAL_UART_Transmit_DMA(&huart1,receivedata,Size);
+    //HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receivedata,sizeof(receivedata));
+
+
+  //}
+//}
 
 /* USER CODE END 0 */
 
@@ -127,11 +128,26 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   MX_I2C1_Init();
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
   //char mess[] ="hello world";
   
   //HAL_UART_Receive_DMA(&huart1,receivedata,2);
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart1,receivedata,sizeof(receivedata));
+  CAN_TxHeaderTypeDef txHeader = {0};
+  txHeader.StdId = 0x200;// TODO 对吗
+  txHeader.ExtId = 0;// TODO对吗
+  txHeader.IDE = CAN_ID_STD;// TODO 不对吧 
+  txHeader.RTR = CAN_RTR_DATA;//TODO 要改吗
+  txHeader.DLC = 8;// TODO 要改吗
+  txHeader.TransmitGlobalTime = DISABLE;
+
+  /* 0x201 M2006 current, big-endian int16, range typically [-10000, 10000] */
+  uint8_t txData[8] = {};
+  txData[0]=0x03;
+  txData[1]=0xE8;
+
+  // TODO 构造控制电机的CAN帧。建议电流值：1000
+  uint32_t txMailbox;
 
 
   /* USER CODE END 2 */
@@ -140,7 +156,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    
+    (void)HAL_CAN_AddTxMessage(&hcan1, &txHeader, txData, &txMailbox);
+
+    HAL_Delay(1000); // TODO 电机的控制频率建议100hz
+
+
     //HAL_UART_Transmit(&huart1,(uint8_t*)mess,strlen(mess),100);
     //HAL_Delay(1000);
     // 
