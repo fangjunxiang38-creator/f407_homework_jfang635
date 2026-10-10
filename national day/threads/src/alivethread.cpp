@@ -54,7 +54,7 @@ static void alive_thread_entry(ULONG thread_input)
         UINT s_imu     = wait_alive(&imu_alive_sem,     50);
         UINT s_control = wait_alive(&control_alive_sem, 50);
 
-            if (s_imu == TX_SUCCESS && s_control == TX_SUCCESS)
+            if (s_imu ==  TX_SUCCESS && s_control == TX_SUCCESS)
         {
             /* 都活着：绿灯亮，红灯灭 */
             LED_On(LED_GREEN);

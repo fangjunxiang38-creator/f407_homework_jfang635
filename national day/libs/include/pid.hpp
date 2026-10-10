@@ -46,5 +46,19 @@ public:
     void UpdateResult();
     void Clear();
 };
+struct PIDTuning
+{
+    float kp;
+    float ki;
+    float kd;
+    float maxOut;
+    float maxIOut;
 
+    void ApplyTo(PID &pid) const
+    {
+        pid.Tuning(kp, ki, kd);
+        pid.maxOut  = maxOut;
+        pid.maxIOut = maxIOut;
+    }
+};
 #endif //RM26_PID_HPP

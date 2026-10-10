@@ -193,38 +193,43 @@ namespace BMI088
 
         /*-------------------------------------加速度计初始化-------------------------------------*/
         
-        //< 先软重启，清空所有寄存器
         uint8_t pTxData;
+
+        /* 1. 软复位 */
         pTxData = ACC_SOFTRESET_VAL;
         WriteReg(BMI088_CS_ACC, ACC_SOFTRESET_ADDR, &pTxData, 1);
-        tx_thread_sleep(100); //< 延时100ms,重启需要时间
+        tx_thread_sleep(100);
 
-        //< 打开加速度计电源
+        /* 2. 打开加速度计电源，写两次（防止软复位后第一次写入被吞） */
         pTxData = ACC_PWR_CTRL_ON;
         WriteReg(BMI088_CS_ACC, ACC_PWR_CTRL_ADDR, &pTxData, 1);
-        tx_thread_sleep(150);
+        tx_thread_sleep(50);
+        WriteReg(BMI088_CS_ACC, ACC_PWR_CTRL_ADDR, &pTxData, 1);
+        tx_thread_sleep(50);
 
-        //< 加速度计变成正常模式
-        pTxData = ACC_PWR_CONF_ACT;
+//active
+         pTxData = ACC_PWR_CONF_ACT;
         WriteReg(BMI088_CS_ACC, ACC_PWR_CONF_ADDR, &pTxData, 1);
-        tx_thread_sleep(10); //
+        tx_thread_sleep(50);
 
-        //< 测量范围
         pTxData = ACC_RANGE_6G;
         WriteReg(BMI088_CS_ACC, ACC_RANGE_ADDR, &pTxData, 1);
-        tx_thread_sleep(5); //< 延时5ms
+        tx_thread_sleep(5);
 
-        pTxData = 0xAB;
+        pTxData = 0xAB;                      
         WriteReg(BMI088_CS_ACC, ACC_CONF_ADDR, &pTxData, 1);
-        tx_thread_sleep(5); //< 延时5ms
+        tx_thread_sleep(5);
 
+       
+       
+        /* 5. 中断引脚 */
         pTxData = 0x08;
         WriteReg(BMI088_CS_ACC, INT1_IO_CTRL_ADDR, &pTxData, 1);
-        tx_thread_sleep(5); //< 延时5ms
+        tx_thread_sleep(5);
 
         pTxData = 0x04;
         WriteReg(BMI088_CS_ACC, INT_MAP_DATA_ADDR, &pTxData, 1);
-        tx_thread_sleep(5); //< 延时5ms
+        tx_thread_sleep(5);
 
         /*-------------------------------------陀螺仪初始化-------------------------------------*/
         //< 先软重启，清空所有寄存器
@@ -255,6 +260,8 @@ namespace BMI088
         pTxData = 0x01;
         WriteReg(BMI088_CS_GYRO, GYRO_INT3_INT4_IO_MAP_ADDR, &pTxData, 1);
         tx_thread_sleep(5); //< 延时5ms
+
+
     }
 
 

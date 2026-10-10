@@ -10,15 +10,7 @@ M2006::M2006()
     /* 减速比 36:1。DJIMotorHandler 解析反馈时要靠它做换算 */
     gearBox = GearBox_M2006;
 
-    /* 速度环：输入 rad/s（输出轴），输出电流原始值 */
-    speedPid.Tuning(1000.0f, 10.0f, 10.0f);
-    speedPid.maxOut  = 5000.0f;
-    speedPid.maxIOut = 500.0f;
 
-    /* 位置环：输入 rad，输出速度目标 rad/s */
-    positionPid.Tuning(10.0f, 0.0f, 0.0f);
-    positionPid.maxOut  = 5.0f;
-    positionPid.maxIOut = 5.0f;
 }
 
 void M2006::setOutput()

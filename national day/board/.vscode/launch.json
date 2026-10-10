@@ -48,6 +48,8 @@
                 "enabled": true,
                 "samplesPerSecond": 20
             },
+
+            
         },
 
     ]

@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "调试 C 板 (ST-Link + OpenOCD)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "D:/f407_homework_jfang635/national day/board",
+            "executable": "D:/f407_homework_jfang635/national day/board/build/Debug/board.elf",
+            "serverpath": "D:/OpenOCD/bin/openocd.exe",
+            "armToolchainPath": "D:/arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi/bin",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "preLaunchTask": "Build (Debug)",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "raw"
+        }
+    ]
+}
