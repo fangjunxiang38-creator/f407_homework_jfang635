@@ -19,8 +19,6 @@ void PID::UpdateResult()
     err[1] = err[0];
     err[0] = ref - fdb;
 
-    // TODO: 按 mode 实现位置式或增量式 PID，并限制积分和最终输出。
-    // 完成前始终保持零输出。
     if (mode == PID_POSITION)
     {
         pResult = kp * err[0];

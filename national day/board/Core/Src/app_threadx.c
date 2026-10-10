@@ -23,6 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "threads.hpp"
 
 /* USER CODE END Includes */
 
@@ -63,6 +64,9 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
 
   /* USER CODE BEGIN App_ThreadX_Init */
   (void)byte_pool;
+  alive_thread_create();
+  imu_thread_create();
+  control_thread_create();
   /* USER CODE END App_ThreadX_Init */
 
   return ret;

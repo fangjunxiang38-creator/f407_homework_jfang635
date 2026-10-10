@@ -1,2 +1,2 @@
-做了bsp，libs,BMI088
+做了bsp，libs,BMI088,M2006,threads
 

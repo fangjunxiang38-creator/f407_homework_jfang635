@@ -11,7 +11,7 @@ extern CAN_HandleTypeDef hcan2;
  */
 void CAN_Init(void)
 {
-    CAN_FilterTypeDef can_filter_st;                   ///< 定义过滤器结构体
+    CAN_FilterTypeDef can_filter_st={};                   ///< 定义过滤器结构体
     can_filter_st.FilterActivation = ENABLE;           ///< ENABLE使能过滤器
     can_filter_st.FilterMode = CAN_FILTERMODE_IDMASK;  ///< 设置过滤器模式--标识符屏蔽位模式
     can_filter_st.FilterScale = CAN_FILTERSCALE_32BIT; ///< 过滤器的位宽 32 位
@@ -35,6 +35,7 @@ void CAN_Init(void)
 
 void CAN_Transmit(CAN_HandleTypeDef *hcan, uint32_t Id, uint8_t *msg, uint16_t len)
 {
+    if (hcan == nullptr || msg == nullptr ) return;
     if (HAL_CAN_GetTxMailboxesFreeLevel(hcan) == 0)
     {
         // 如果邮箱已满，可以选择等待或者采取其他操作
@@ -43,7 +44,7 @@ void CAN_Transmit(CAN_HandleTypeDef *hcan, uint32_t Id, uint8_t *msg, uint16_t l
         return;
     }
     // TODO: 校验标准帧 ID 和 DLC (0~8)，构造帧头并调用 HAL_CAN_AddTxMessage。
-    if (hcan == nullptr || msg == nullptr || len == 0U || len > 8U) return;
+    if ( len == 0U || len > 8U) return;
     if (Id > 0x7FFU) return;
 
     CAN_TxHeaderTypeDef tx_header;

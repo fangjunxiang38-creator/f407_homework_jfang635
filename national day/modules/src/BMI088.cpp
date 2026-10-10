@@ -273,10 +273,10 @@ namespace BMI088
         int16_t raw_y = (int16_t)((uint16_t)buf[3] << 8 | buf[2]);
         int16_t raw_z = (int16_t)((uint16_t)buf[5] << 8 | buf[4]);
 
-        /* 换算单位：g/LSB × 9.80665 = m/s² */
-        data->x = raw_x * IMU_ACCEL_6G_SEN * 9.80665f;
-        data->y = raw_y * IMU_ACCEL_6G_SEN * 9.80665f;
-        data->z = raw_z * IMU_ACCEL_6G_SEN * 9.80665f;
+        
+        data->x = raw_x * IMU_ACCEL_6G_SEN;
+        data->y = raw_y * IMU_ACCEL_6G_SEN;
+        data->z = raw_z * IMU_ACCEL_6G_SEN;
 
         acc_data = *data;
 

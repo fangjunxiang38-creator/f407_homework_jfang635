@@ -18,7 +18,7 @@ M2006::M2006()
     /* 位置环：输入 rad，输出速度目标 rad/s */
     positionPid.Tuning(10.0f, 0.0f, 0.0f);
     positionPid.maxOut  = 5.0f;
-    positionPid.maxIOut = 50.0f;
+    positionPid.maxIOut = 5.0f;
 }
 
 void M2006::setOutput()

@@ -60,8 +60,11 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${USER_DIR}/modules/src/BMI088.cpp
     ${USER_DIR}/modules/src/DJIMotorHandler.cpp
     ${USER_DIR}/modules/src/M2006.cpp
+    ${USER_DIR}/modules/src/LED.cpp
 
     ${USER_DIR}/threads/src/alivethread.cpp
+    ${USER_DIR}/threads/src/controlthread.cpp
+    ${USER_DIR}/threads/src/imuthread.cpp
 )
 
 # Add include paths

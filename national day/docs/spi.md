@@ -1,4 +1,4 @@
-![spi](\f407_homework_jfang635\national day\assets\spi.jpg)
+![spi](../assets/spi.jpg)
 
 
 
