@@ -66,6 +66,7 @@ namespace BMI088
         float temp = 0.0f;
 
         ReadAccTemperature(&temp);
+        acc_data.temperature = temp;
 
         TempPid.ref = target_temp;
         TempPid.fdb = temp;
@@ -201,16 +202,17 @@ namespace BMI088
         tx_thread_sleep(100);
 
         /* 2. 打开加速度计电源，写两次（防止软复位后第一次写入被吞） */
-        pTxData = ACC_PWR_CTRL_ON;
+        pTxData = ACC_PWR_CTRL_ON;//(0x04)
         WriteReg(BMI088_CS_ACC, ACC_PWR_CTRL_ADDR, &pTxData, 1);
         tx_thread_sleep(50);
         WriteReg(BMI088_CS_ACC, ACC_PWR_CTRL_ADDR, &pTxData, 1);
         tx_thread_sleep(50);
 
 //active
-         pTxData = ACC_PWR_CONF_ACT;
+        pTxData = ACC_PWR_CONF_ACT;
         WriteReg(BMI088_CS_ACC, ACC_PWR_CONF_ADDR, &pTxData, 1);
         tx_thread_sleep(50);
+
 
         pTxData = ACC_RANGE_6G;
         WriteReg(BMI088_CS_ACC, ACC_RANGE_ADDR, &pTxData, 1);
