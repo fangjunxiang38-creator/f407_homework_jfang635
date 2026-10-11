@@ -38,6 +38,35 @@ typedef struct gyro_data_t
     float z;
 } gyro_data_t;
 
+
+
+/**
+ * @struct mag_data_t
+ * @brief 磁力计数据结构体
+ * @param x x轴磁场，单位 µT
+ * @param y y轴磁场，单位 µT
+ * @param z z轴磁场，单位 µT
+ */
+typedef struct mag_data_t
+{
+    float x;
+    float y;
+    float z;
+} mag_data_t;
+
+/**
+ * @struct mag_error_t
+ * @brief 磁力计错误状态
+ */
+typedef struct mag_error_t
+{
+    bool CHIP_ID_ERR = true;      // WHO_AM_I 不对则为 true
+    bool DATA_ERR   = true;       // 三轴全 0 则为 true
+    bool INIT_ERR   = true;       // 初始化失败则为 true
+    bool COMM_ERR   = false;      // I2C 通信失败则为 true
+} mag_error_t;
+
+
 /**
  * @struct imu_error_t
  * @brief IMU错误状态结构体
@@ -52,6 +81,7 @@ typedef struct imu_error_t
     bool INIT_ERR = true;              // 初始化错误则为true
     bool CALIBRATE_ERR = false;        // 标定错误则为true
     bool TEMP_CTRL_ERR = true;         // 温度控制错误则为true
+    bool COMM_ERR = false;             // SPI 收发出错则为 true
 } imu_error_t;
 
 class cIMU

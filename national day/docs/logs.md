@@ -17,11 +17,13 @@ bsp，libs,BMI088,M2006,threads
 
 ​	temperature=0:没有赋值
 
+​	mag
 
 
 
 
-![imu0](../assets/imu2.png)
+
+![imu3](../assets/imu3.png)
 
 - control
 

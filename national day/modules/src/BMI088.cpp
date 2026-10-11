@@ -77,6 +77,13 @@ namespace BMI088
         if (duty < 0.0f) duty = 0.0f;
         if (duty > 1.0f) duty = 1.0f;
         PWM_SetDutyRatio(&HEATING_RESISTANCE_TIM, duty, HEATING_RESISTANCE_CHANNEL);
+        
+
+        /* 温度读到合理值、PWM 也写成功 → 温控正常 */
+        if (temp > -20.0f && temp < 100.0f)
+            self_test.TEMP_CTRL_ERR = false;
+        else
+            self_test.TEMP_CTRL_ERR = true;    /* 温度明显不合理 → 报错 */
     }
 
     void cBMI088::VerifyAccChipID()
@@ -137,11 +144,14 @@ namespace BMI088
 
     void cBMI088::WriteReg(enum BMI088_SENSOR cs, uint8_t addr, uint8_t *data, uint8_t len)
     {
+        
+
         // TODO: 根据 cs 拉低对应 GPIO 片选；按 SPI 写协议发送地址和数据，
         // 最后释放片选，并处理通信失败与必要的延时。
         if (data == nullptr || len == 0) return;
 
         uint8_t reg = addr & BMI088_SPI_WRITE_CODE;   /* 写：最高位清 0 */
+        bool ok = true; 
 
         /* 拉低对应片选 */
         if (cs == BMI088_CS_ACC)
@@ -149,14 +159,18 @@ namespace BMI088
         else
             HAL_GPIO_WritePin(BMI088_GYRO_CS_PORT, BMI088_GYRO_CS_PIN, GPIO_PIN_RESET);
 
-        HAL_SPI_Transmit(&BMI088_SPI_HANDLE, &reg, 1, 100);     /* 发地址 */
-        HAL_SPI_Transmit(&BMI088_SPI_HANDLE, data, len, 100);   /* 发数据 */
+          /* 发地址  发数据 */
+
+        if (HAL_SPI_Transmit(&BMI088_SPI_HANDLE, &reg, 1, 100) != HAL_OK)   ok = false;
+        if (HAL_SPI_Transmit(&BMI088_SPI_HANDLE, data, len, 100) != HAL_OK) ok = false;
 
         /* 拉高片选 */
         if (cs == BMI088_CS_ACC)
             HAL_GPIO_WritePin(BMI088_ACC_CS_PORT, BMI088_ACC_CS_PIN, GPIO_PIN_SET);
         else
             HAL_GPIO_WritePin(BMI088_GYRO_CS_PORT, BMI088_GYRO_CS_PIN, GPIO_PIN_SET);
+
+        self_test.COMM_ERR = !ok;      
     }
 
     void cBMI088::ReadReg(enum BMI088_SENSOR cs, uint8_t addr, uint8_t *data, uint8_t len)
@@ -168,24 +182,27 @@ namespace BMI088
 
         uint8_t reg   = addr | BMI088_SPI_READ_CODE;   /* 读：最高位置 1 */
         uint8_t dummy = 0;
+        bool ok = true; 
 
         if (cs == BMI088_CS_ACC)
             HAL_GPIO_WritePin(BMI088_ACC_CS_PORT, BMI088_ACC_CS_PIN, GPIO_PIN_RESET);
         else
             HAL_GPIO_WritePin(BMI088_GYRO_CS_PORT, BMI088_GYRO_CS_PIN, GPIO_PIN_RESET);
 
-        HAL_SPI_Transmit(&BMI088_SPI_HANDLE, &reg, 1, 100);   /* 发地址 */
+          /* 发地址 */
+        if (HAL_SPI_Transmit(&BMI088_SPI_HANDLE, &reg, 1, 100) != HAL_OK)  ok = false;
 
         /* 加速度计的真数据比陀螺仪晚一拍，先收掉一个无效字节 */
         if (cs == BMI088_CS_ACC)
             HAL_SPI_Receive(&BMI088_SPI_HANDLE, &dummy, 1, 100);
 
-        HAL_SPI_Receive(&BMI088_SPI_HANDLE, data, len, 100);  /* 收数据 */
+        if (HAL_SPI_Receive(&BMI088_SPI_HANDLE, data, len, 100) != HAL_OK)  ok = false; /* 收数据 */
 
         if (cs == BMI088_CS_ACC)
             HAL_GPIO_WritePin(BMI088_ACC_CS_PORT, BMI088_ACC_CS_PIN, GPIO_PIN_SET);
         else
             HAL_GPIO_WritePin(BMI088_GYRO_CS_PORT, BMI088_GYRO_CS_PIN, GPIO_PIN_SET);
+        self_test.COMM_ERR = !ok;
     }
 
     void cBMI088::Config()
